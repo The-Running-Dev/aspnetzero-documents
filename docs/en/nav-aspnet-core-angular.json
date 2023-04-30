@@ -393,12 +393,12 @@
                       "path": "Developing-Step-By-Step-Angular-Database-Migrations-Person-Entity.md"
                     },
                     {
-                      "text": "Creating Unit Tests for Person Application Service",
-                      "path": "Developing-Step-By-Step-Angular-Creating-Unit-Tests-for-Person-Application-Service.md"
-                    },
-                    {
                       "text": "Creating Person Application Service",
                       "path": "Developing-Step-By-Step-Angular-Creating-Person-Application-Service.md"
+                    },
+                    {
+                      "text": "Creating Unit Tests for Person Application Service",
+                      "path": "Developing-Step-By-Step-Angular-Creating-Unit-Tests-for-Person-Application-Service.md"
                     },
                     {
                       "text": "Using GetPeople Method From Angular Component",
@@ -451,7 +451,11 @@
                     {
                       "text": "Adding AddPhone and DeletePhone Methods",
                       "path": "Developing-Step-By-Step-Angular-Adding-AddPhone-DeletePhone-Methods.md"
-                    },
+                  },
+                  {
+                    "text": "Show Phones in View",
+                    "path": "Developing-Step-By-Step-Angular-Show-Phones-In-View.md"
+                  },
                     {
                       "text": "Edit Mode For Phone Numbers",
                       "path": "Developing-Step-By-Step-Angular-Edit-Mode-Phone-Numbers.md"

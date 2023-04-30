@@ -1,11 +1,12 @@
-# Adding AddPhone and DeletePhone Methods
+# Adding GetPerson, AddPhone and DeletePhone Methods
 
-We are adding two more methods to IPersonAppService interface as shown
+We are adding three more methods to IPersonAppService interface as shown
 below:
 
 ```csharp
 Task DeletePhone(EntityDto<long> input);
 Task<PhoneInPersonListDto> AddPhone(AddPhoneInput input);
+Task<PersonListDto> GetPerson(int id);
 ```
 
 We could create a new, separated IPhoneAppService. It's your choice.
@@ -37,7 +38,7 @@ public class PhoneConsts
 }
 ```
 
-Now, we can implement these methods:
+Now, we can implement these methods as shown below. Just note that, you have to inject ```IRepository<Phone, long>``` to the constructor of PersonAppService just like ```IRepository<Person>``` we did before.
 
 ```csharp
 [AbpAuthorize(AppPermissions.Pages_Tenant_PhoneBook_EditPerson)]
@@ -60,6 +61,24 @@ public async Task<PhoneInPersonListDto> AddPhone(AddPhoneInput input)
 
     return ObjectMapper.Map<PhoneInPersonListDto>(phone);
 }
+
+public async Task<PersonListDto> GetPerson(int id)
+{
+    var person = await _personRepository.FirstOrDefaultAsync(id);
+    return ObjectMapper.Map<PersonListDto>(person);
+}
+```
+
+After creating the AddPhone method, define edit permisison string in AppPermissions.cs as shown below;
+
+```csharp
+public const string Pages_Tenant_PhoneBook_EditPerson = "Pages.Tenant.PhoneBook.EditPerson";
+```
+
+And, define the permisison itself in AppAuthorizationProvider.cs as shown below;
+
+```csharp
+phoneBook.CreateChildPermission(AppPermissions.Pages_Tenant_PhoneBook_EditPerson, L("EditPerson"), multiTenancySides: MultiTenancySides.Tenant);
 ```
 
 Then we add configuration for AutoMapper into CustomDtoMapper.cs like below:
@@ -91,4 +110,4 @@ different pros and cons. It's your choice.
 
 ## Next
 
-- [Edit Mode for Phone Numbers](Developing-Step-By-Step-Angular-Edit-Mode-Phone-Numbers)
+- [Show Phones In View](Developing-Step-By-Step-Angular-Show-Phones-In-View)

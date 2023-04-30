@@ -7,77 +7,57 @@ button.
 So, changing the **Index.cshtml** view header as shown below:
 
 ```html
-@using System.Threading.Tasks
-@using Acme.PhoneBook.Web.Areas.App.Startup
-@model Acme.PhoneBook.Web.Areas.App.Models.PhoneBook.IndexViewModel
 
 @{
     ViewBag.CurrentPageName = AppPageNames.Tenant.PhoneBook;
 }
-
 @section Scripts
 {
-    <environment names="Development">
-        <script src="~/view-resources/Areas/App/Views/PhoneBook/_CreatePersonModal.js" asp-append-version="true"></script>
-        <script src="~/view-resources/Areas/App/Views/PhoneBook/Index.js" asp-append-version="true"></script>
-    </environment>
+    <script src="~/view-resources/Areas/App/Views/PhoneBook/Index.js" asp-append-version="true"></script>
 }
 
-<div class="row kt-margin-b-5">
-    <div class="col-xs-6">
-        <div class="page-head">
-            <div class="page-title">
-                <h1>
-                    <span>@L("PhoneBook")</span>
-                </h1>
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+    <abp-page-subheader title="@L("PhoneBook")" description="@L("PhoneBookInfo")">
+        <button id="CreateNewPersonButton" class="btn btn-primary">
+            <i class="fa fa-plus"></i> @L("CreateNewPerson")
+        </button>        
+    </abp-page-subheader>
+    <div class="@(await GetContainerClass())">
+        <div class="card">
+            <div class="card-body">
+                <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="PhoneBookTable">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>@L("Name")</th>
+                        <th>@L("Surname")</th>
+                        <th>@L("EmailAddress")</th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
         </div>
-    </div>
-
-    <div class="col-xs-6 text-right">
-        <button id="CreateNewPersonButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("CreateNewPerson")</button>
-    </div>
-</div>
-
-<div class="portlet light">
-    <div class="portlet-body">
-
-        <h3>@L("AllPeople")</h3>
-
-        <div class="list-group">
-            @foreach (var person in Model.Items)
-            {
-                <a href="javascript:;" class="list-group-item">
-                    <h4 class="list-group-item-heading">
-                        @person.Name @person.Surname
-                    </h4>
-                    <p class="list-group-item-text">
-                        @person.EmailAddress
-                    </p>
-                </a>
-            }
-        </div>
-
     </div>
 </div>
 ```
 
-We included modal's javascript (\_CreatePersonModal.js) and a
-**Index.js** file which is defined as shown below:
+We included modal's javascript (\_CreatePersonModal.js). Now add following to **Index.js** file which is defined before:
 
 ```javascript
 (function () {
-    var _createPersonModal = new app.ModalManager({
-        viewUrl: abp.appPath + 'App/PhoneBook/CreatePersonModal',
-        scriptUrl: abp.appPath + 'view-resources/Areas/App/Views/PhoneBook/_CreatePersonModal.js',
-        modalClass: 'CreatePersonModal'
-    });
+    $(function () {
+        //...
+        var _createPersonModal = new app.ModalManager({
+            viewUrl: abp.appPath + 'App/PhoneBook/CreatePersonModal',
+            scriptUrl: abp.appPath + 'view-resources/Areas/App/Views/PhoneBook/_CreatePersonModal.js',
+            modalClass: 'CreatePersonModal'
+        });
 
-    $('#CreateNewPersonButton').click(function (e) {
-        e.preventDefault();
-        _createPersonModal.open();
-    });
-})();
+        $('#CreateNewPersonButton').click(function (e) {
+            e.preventDefault();
+            _createPersonModal.open();
+        });
+//...
 ```
 
 **ModalManager** is a predefined modal helper javascript class of AspNet
@@ -102,7 +82,7 @@ public PartialViewResult CreatePersonModal()
 Now, we can run the application and open the modal by clicking the
 'Create New Person' button:
 
-<img src="images/phonebook-create-person-dialog2.png" alt="Create Person Dialog" class="img-thumbnail" />
+<img src="images/phonebook-create-person-dialog3.png" alt="Create Person Dialog" class="img-thumbnail" />
 
 ## Next
 

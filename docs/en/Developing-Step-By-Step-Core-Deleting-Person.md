@@ -2,7 +2,7 @@
 
 Let's add a delete button in people list as shown below:
 
-<img src="images/phonebook-people-delete-button3.png" alt="Delete person" class="img-thumbnail" />
+<img src="images/phonebook-people-delete-button-4.png" alt="Delete person" class="img-thumbnail" />
 
 We're starting from UI in this case.
 
@@ -12,88 +12,114 @@ We're changing **index.cshtml** view to add a button (related part is
 shown here):
 
 ```html
-<div id="AllPeopleList" class="list-group">
-    @foreach (var person in Model.Items)
-    {
-        <a href="javascript:;" class="list-group-item" data-person-id="@person.Id">
-            <h4 class="list-group-item-heading">
-                @person.Name @person.Surname
-        @if (IsGranted(AppPermissions.Pages_Tenant_PhoneBook_DeletePerson))
-        {
-            <button title="@L("Delete")" class="btn btn-circle btn-icon-only btn-danger delete-person" href="javascript:;">
-                <i class="la la-trash"></i>
-            </button>
-        }
-            </h4>
-            <p class="list-group-item-text">
-                @person.EmailAddress
-            </p>
-        </a>
-    }
-</div>
+<table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="AllPeopleList">
+    <thead>
+    <tr>
+        <th></th>
+        <th>@L("Actions")</th><!--Add actions here-->
+        <th>@L("Name")</th>
+        <th>@L("Surname")</th>
+        <th>@L("EmailAddress")</th>
+    </tr>
+    </thead>   
+</table>
 ```
 
 Surely, we defined 'delete person' permission as like before.
-
-### Style
-
-We're using a **[LESS](http://lesscss.org/)** style here to take button
-right. Created a file named **index.less** and added following lines:
-
-```css
-#AllPeopleList {
-    .list-group-item-heading {
-        button.delete-person {
-            float: right;
-        }
-    }
-}
-```
-
-And add the style to your Index.cshtml page (You can also add minified
-versions of styles for other environments like production and staging):
-
-```html
-@section Styles
-{
-    <environment names="Development">
-        <link rel="stylesheet" href="~/view-resources/Areas/App/Views/PhoneBook/Index.css" asp-append-version="true" />
-    </environment>
-}
-```
 
 ### Javascript
 
 Now, adding code to delete person (to Index.js):
 
 ```javascript
-var _personService = abp.services.app.person;
+//add permission check
+var _permissions = {
+    delete: abp.auth.hasPermission('Pages.Tenant.PhoneBook.DeletePerson')
+};
+//update datatable to add action buttons
 
-$('#AllPeopleList button.delete-person').click(function (e) {
-    e.preventDefault();
+var dataTable = _$phonebookTable.DataTable({   
+    listAction: {
+    ajaxFunction: _personService.getPeople,
+    },
+    columnDefs: [
+        {//to make your view responsive
+            className: 'control responsive',
+            orderable: false,
+            render: function () {
+            return '';
+            },
+            targets: 0,
+        },
+        {//add  buttons to first coloumn
+            targets: 1,
+            data: null,
+            orderable: false,
+            autoWidth: false,
+            defaultContent: '',
+            rowAction: {
+                text:
+                '<i class="fa fa-cog"></i> <span class="d-none d-md-inline-block d-lg-inline-block d-xl-inline-block">' +
+                app.localize('Actions') +
+                '</span> <span class="caret"></span>',
+                items: [//buttons to add in action dropdown
+                    {
+                        text: app.localize('Edit'),
+                        visible: function () {
+                            return true;
+                        },
+                        action: function (data) {
+                            //will be filled
+                        },
+                    },
+                    {
+                        text: app.localize('Delete'),
+                        visible: function (data) {//will be visible only if user has required permission
+                            return _permissions.delete;
+                        },
+                        action: function (data) {//on button click
+                            deletePerson(data.record.id);
+                        },
+                    }
+                ],
+            }
+        },    
+        {
+            targets: 2,
+            data: 'name',
+        },
+        {
+            targets: 3,
+            data: 'surname',
+        },
+        {
+            targets: 4,
+            data: 'emailAddress',
+        },
+    ],
+});
 
-    var $listItem = $(this).closest('.list-group-item');
-    var personId = $listItem.attr('data-person-id');
-
+function deletePerson(personId) {
     abp.message.confirm(
         app.localize('AreYouSureToDeleteThePerson'),
-        function(isConfirmed) {
+        app.localize('AreYouSure'),
+        function (isConfirmed) {
             if (isConfirmed) {
                 _personService.deletePerson({
                     id: personId
                 }).done(function () {
                     abp.notify.info(app.localize('SuccessfullyDeleted'));
-                    $listItem.remove();
+                    getPeople();
                 });
             }
         }
     );
-});
+}
 ```
 
 It first shows a confirmation message when we click the delete button:
 
-<img src="images/confirmation-delete-person2.png" alt="Confirmation message" class="img-thumbnail" />
+<img src="images/confirmation-delete-person-3.png" alt="Confirmation message" class="img-thumbnail" />
 
 If we click Yes, it simply calls **deletePerson** method of
 **PersonAppService** and shows a
